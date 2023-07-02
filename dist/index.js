@@ -7696,6 +7696,29 @@ class PathBase {
     isUnknown() {
         return (this.#type & IFMT) === UNKNOWN;
     }
+    isType(type) {
+        return this[`is${type}`]();
+    }
+    getType() {
+        return this.isUnknown()
+            ? 'Unknown'
+            : this.isDirectory()
+                ? 'Directory'
+                : this.isFile()
+                    ? 'File'
+                    : this.isSymbolicLink()
+                        ? 'SymbolicLink'
+                        : this.isFIFO()
+                            ? 'FIFO'
+                            : this.isCharacterDevice()
+                                ? 'CharacterDevice'
+                                : this.isBlockDevice()
+                                    ? 'BlockDevice'
+                                    : /* c8 ignore start */ this.isSocket()
+                                        ? 'Socket'
+                                        : 'Unknown';
+        /* c8 ignore stop */
+    }
     /**
      * Is the Path a regular file?
      */
@@ -10267,7 +10290,7 @@ class LRUCache {
         const pcall = (res, rej) => {
             const fmp = this.#fetchMethod?.(k, v, fetchOpts);
             if (fmp && fmp instanceof Promise) {
-                fmp.then(v => res(v), rej);
+                fmp.then(v => res(v === undefined ? undefined : v), rej);
             }
             // ignored, we go until we finish, regardless.
             // defer check until we are actually aborting,
@@ -10275,7 +10298,7 @@ class LRUCache {
             ac.signal.addEventListener('abort', () => {
                 if (!options.ignoreFetchAbort ||
                     options.allowStaleOnFetchAbort) {
-                    res();
+                    res(undefined);
                     // when it eventually resolves, update the cache.
                     if (options.allowStaleOnFetchAbort) {
                         res = v => cb(v, true);
