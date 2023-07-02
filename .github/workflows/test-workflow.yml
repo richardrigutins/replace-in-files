@@ -1,0 +1,99 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: |
+          npm install
+
+      - run: |
+          npm run all
+
+  test: # make sure the action works on a clean machine without building
+    strategy:
+      matrix:
+        # os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest ] # only test on ubuntu for now
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Replace in Files - replace string
+        uses: ./
+        with:
+          search-text: '@VERSION@'
+          files: '**/*.txt'
+          replacement-text: '1.0.2'
+          exclude: '**/*.check.txt'
+
+      - name: Replace in Files - replace using special characters
+        uses: ./
+        with:
+          search-text: '{0}'
+          files: '**/*.txt'
+          replacement-text: 'world'
+          exclude: '**/*.check.txt'
+
+      - name: Replace in Files - pattern finds only one file
+        uses: ./
+        with:
+          search-text: '23'
+          files: '**/test2.txt'
+          replacement-text: '42'
+          exclude: '**/*.check.txt'
+
+      - name: Replace in Files - single file
+        uses: ./
+        with:
+          search-text: 'false'
+          files: 'test-files/test2.txt'
+          replacement-text: 'true'
+          exclude: '**/*.check.txt'
+
+      - name: Replace in Files - no files matching pattern
+        uses: ./
+        with:
+          search-text: 'foo'
+          files: '**/*.invalid'
+          replacement-text: 'bar'
+          exclude: '**/*.check.txt'
+
+      - name: Replace in Files - error on invalid encoding
+        uses: ./
+        continue-on-error: true
+        with:
+          search-text: 'foo'
+          files: '**/*.txt'
+          replacement-text: 'bar'
+          encoding: 'invalid'
+          exclude: '**/*.check.txt'
+
+      - name: Verify changes
+        run: |
+          echo "  > Actual - test1.txt"
+          cat test-files/test1.txt
+          echo "=================="
+          echo "  > Expected - test1.txt"
+          cat test-files/test1.check.txt
+          echo "=================="
+          echo "  > Actual - test2.txt"
+          cat test-files/test2.txt
+          echo "=================="
+          echo "  > Expected - test2.txt"
+          cat test-files/test2.check.txt
+          echo "=================="
+          diff test-files/test1.txt test-files/test1.check.txt >diff1.txt
+          diff test-files/test2.txt test-files/test2.check.txt >diff2.txt

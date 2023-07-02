@@ -1,0 +1,4 @@
+Version: @VERSION@.
+Hello {0}!
+This should be twenty-three: 23.
+This line has been changed: false.

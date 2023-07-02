@@ -1,0 +1,40 @@
+name: "Replace in files"
+author: "richardrigutins"
+description: |-
+  Find and replace text in files by matching strings.
+
+inputs:
+  files:
+    description: |-
+      The files to be searched.
+      It can be the path to a file or a glob pattern (e.g. `**/*.txt`).
+    required: true
+  replacement-text:
+    description: |-
+      The text that will replace the matched text.
+    required: true
+  search-text:
+    description: |-
+      The text that will be replaced.
+    required: true
+  encoding:
+    description: |-
+      (Optional) The encoding of the files to be searched.
+      The following values are supported: `ascii`, `utf8`, `utf16le`, `ucs2`, `base64`, `latin1`.
+      Defaults to `utf8`.
+    default: "utf8"
+    required: false
+  exclude:
+    description: |-
+      (Optional) The files to be excluded from the search.
+      It can be the path to a file or a glob pattern (e.g. `**/*.md`).
+    default: ""
+    required: false
+
+branding:
+  icon: "edit"
+  color: "blue"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
