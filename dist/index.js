@@ -35,10 +35,10 @@ function run() {
                 return;
             }
             (0, core_1.info)(`Found ${filePaths.length} files for the given pattern.`);
-            (0, core_1.info)(`Replacing text...`);
+            (0, core_1.info)(`Replacing "${searchText}" with "${replaceText}".`);
             const encoding = inputEncoding;
             const promises = filePaths.map((filePath) => __awaiter(this, void 0, void 0, function* () {
-                (0, core_1.debug)(`Replacing text in file ${filePath}`);
+                (0, core_1.info)(`Replacing text in file ${filePath}`);
                 yield (0, utils_1.replaceTextInFile)(filePath, searchText, replaceText, encoding);
             }));
             yield Promise.all(promises);
