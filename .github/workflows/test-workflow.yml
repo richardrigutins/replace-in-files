@@ -47,6 +47,16 @@ jobs:
           replacement-text: 'world'
           exclude: '**/*.check.txt'
 
+      - name: Replace in Files - replace using environment variable
+        uses: ./
+        with:
+          search-text: '_ENV_'
+          files: '**/*.txt'
+          replacement-text: ${{ env.REPLACEMENT }}
+          exclude: '**/*.check.txt'
+        env:
+          REPLACEMENT: environment
+
       - name: Replace in Files - pattern finds only one file
         uses: ./
         with:

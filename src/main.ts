@@ -25,12 +25,12 @@ async function run(): Promise<void> {
     }
 
     info(`Found ${filePaths.length} files for the given pattern.`);
-    info(`Replacing text...`);
+    info(`Replacing "${searchText}" with "${replaceText}".`);
 
     const encoding = inputEncoding as Encoding;
     const promises: Promise<void>[] = filePaths.map(
       async (filePath: string) => {
-        debug(`Replacing text in file ${filePath}`);
+        info(`Replacing text in file ${filePath}`);
         await replaceTextInFile(filePath, searchText, replaceText, encoding);
       },
     );
