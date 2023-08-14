@@ -52,7 +52,7 @@ jobs:
         with:
           search-text: '_ENV_'
           files: '**/*.txt'
-          replacement-text: $REPLACEMENT
+          replacement-text: ${{ env.REPLACEMENT }}
           exclude: '**/*.check.txt'
         env:
           REPLACEMENT: environment
