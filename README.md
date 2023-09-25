@@ -34,7 +34,7 @@ It can be useful for automating repetitive tasks such as updating version number
 # Replace all the occurrences of 'hello' with 'world' in all the txt files, 
 # excluding the node_modules folder
 - name: Replace multiple files
-  uses: richardrigutins/replace-in-files@v1
+  uses: richardrigutins/replace-in-files@v2
   with:
     files: '**/*.txt'
     search-text: 'hello'
@@ -44,7 +44,7 @@ It can be useful for automating repetitive tasks such as updating version number
 
 # Replace all the occurrences of '{0}' with '42' in the README.md file
 - name: Replace single file
-  uses: richardrigutins/replace-in-files@v1
+  uses: richardrigutins/replace-in-files@v2
   with:
     files: 'README.md'
     search-text: '{0}'
