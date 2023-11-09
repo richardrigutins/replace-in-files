@@ -40,6 +40,30 @@ export async function getFiles(
 }
 
 /**
+ * Processes an array in chunks, applying a given function to each item.
+ * @param array The array to process.
+ * @param func The function to apply to each item.
+ * @param chunkSize The number of items to process at a time.
+ * @returns A Promise that resolves when all items have been processed.
+ */
+export async function processInChunks<T>(
+  array: T[],
+  func: (item: T) => Promise<void>,
+  chunkSize: number,
+): Promise<void> {
+  // Split the array into chunks
+  const chunks = Array(Math.ceil(array.length / chunkSize))
+    .fill(0)
+    .map((_, index) => index * chunkSize)
+    .map(begin => array.slice(begin, begin + chunkSize));
+
+  // Process each chunk
+  for (const chunk of chunks) {
+    await Promise.all(chunk.map(func));
+  }
+}
+
+/**
  * Replaces all instances of the given text with the given value in the file.
  * @param filePath The path of the file to modify.
  * @param searchText The string to search for.

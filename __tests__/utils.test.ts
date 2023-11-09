@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { getFiles, isValidEncoding, replaceTextInFile } from '../src/utils';
+import {
+  getFiles,
+  isValidEncoding,
+  processInChunks,
+  replaceTextInFile,
+} from '../src/utils';
 
 describe('isValidEncoding', () => {
   it('should return true for valid encodings', () => {
@@ -26,6 +31,33 @@ describe('getFiles', () => {
     const pattern = path.join(__dirname, '*.test.ts');
     const files = await getFiles(pattern);
     expect(files).toContain(path.join(__dirname, 'utils.test.ts'));
+  });
+});
+
+describe('processInChunks', () => {
+  it('should process an array in chunks', async () => {
+    const totalItems = 999;
+    const array = Array.from({ length: totalItems }, (_, i) => i);
+    const func = jest.fn(async (item: number) => {
+      item++;
+    });
+    const chunkSize = 100;
+
+    await processInChunks(array, func, chunkSize);
+
+    expect(func).toHaveBeenCalledTimes(totalItems);
+  });
+
+  it('should process an array with less items than chunk size', async () => {
+    const array = Array.from({ length: 50 }, (_, i) => i);
+    const func = jest.fn(async (item: number) => {
+      item++;
+    });
+    const chunkSize = 100;
+
+    await processInChunks(array, func, chunkSize);
+
+    expect(func).toHaveBeenCalledTimes(50);
   });
 });
 
