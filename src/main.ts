@@ -2,6 +2,7 @@ import { debug, getInput, info, setFailed, warning } from '@actions/core';
 import {
   Encoding,
   getFiles,
+  isPositiveInteger,
   isValidEncoding,
   processInChunks,
   replaceTextInFile,
@@ -16,10 +17,16 @@ async function run(): Promise<void> {
     const replaceText = getInput('replacement-text');
     const excludePattern = getInput('exclude');
     const inputEncoding = getInput('encoding');
+    const maxParallelism = getInput('max-parallelism');
 
     // Validate the encoding
     if (!isValidEncoding(inputEncoding)) {
       throw new Error(`Invalid encoding: ${inputEncoding}`);
+    }
+
+    // Validate that maxParallelism is a positive integer
+    if (!isPositiveInteger(maxParallelism)) {
+      throw new Error(`Invalid max-parallelism: ${maxParallelism}`);
     }
 
     // Get the file paths that match the files pattern and do not match the exclude pattern
@@ -34,11 +41,10 @@ async function run(): Promise<void> {
     info(`Found ${filePaths.length} files for the given pattern.`);
     info(`Replacing "${searchText}" with "${replaceText}".`);
 
-    const encoding = inputEncoding as Encoding;
-
     // Process the file paths in chunks, replacing the search text with the replace text in each file
     // This is done to avoid opening too many files at once
-    const chunkSize = 10;
+    const encoding = inputEncoding as Encoding;
+    const chunkSize = parseInt(maxParallelism);
     await processInChunks(
       filePaths,
       async (filePath: string) => {

@@ -2,10 +2,34 @@ import fs from 'fs';
 import path from 'path';
 import {
   getFiles,
+  isPositiveInteger,
   isValidEncoding,
   processInChunks,
   replaceTextInFile,
 } from '../src/utils';
+
+describe('isPositiveInteger', () => {
+  it('should return true for positive integers', () => {
+    expect(isPositiveInteger('1')).toBe(true);
+    expect(isPositiveInteger('123')).toBe(true);
+  });
+
+  it('should return false for zero', () => {
+    expect(isPositiveInteger('0')).toBe(false);
+  });
+
+  it('should return false for negative integers', () => {
+    expect(isPositiveInteger('-1')).toBe(false);
+  });
+
+  it('should return false for non-integer numbers', () => {
+    expect(isPositiveInteger('1.5')).toBe(false);
+  });
+
+  it('should return false for non-numeric strings', () => {
+    expect(isPositiveInteger('abc')).toBe(false);
+  });
+});
 
 describe('isValidEncoding', () => {
   it('should return true for valid encodings', () => {

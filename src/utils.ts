@@ -13,6 +13,16 @@ const encodings = [
 export type Encoding = (typeof encodings)[number];
 
 /**
+ * Checks if a given string represents a positive integer.
+ *
+ * @param value - The string to check.
+ * @returns True if the string represents a positive integer, false otherwise.
+ */
+export function isPositiveInteger(value: string): boolean {
+  return /^[1-9]\d*$/.test(value);
+}
+
+/**
  * Checks if the given encoding is supported.
  * @param encoding The encoding to check.
  * @returns `true` if the encoding is valid, `false` otherwise.

@@ -28,9 +28,14 @@ function run() {
             const replaceText = (0, core_1.getInput)('replacement-text');
             const excludePattern = (0, core_1.getInput)('exclude');
             const inputEncoding = (0, core_1.getInput)('encoding');
+            const maxParallelism = (0, core_1.getInput)('max-parallelism');
             // Validate the encoding
             if (!(0, utils_1.isValidEncoding)(inputEncoding)) {
                 throw new Error(`Invalid encoding: ${inputEncoding}`);
+            }
+            // Validate that maxParallelism is a positive integer
+            if (!(0, utils_1.isPositiveInteger)(maxParallelism)) {
+                throw new Error(`Invalid max-parallelism: ${maxParallelism}`);
             }
             // Get the file paths that match the files pattern and do not match the exclude pattern
             const filePaths = yield (0, utils_1.getFiles)(filesPattern, excludePattern);
@@ -41,10 +46,10 @@ function run() {
             }
             (0, core_1.info)(`Found ${filePaths.length} files for the given pattern.`);
             (0, core_1.info)(`Replacing "${searchText}" with "${replaceText}".`);
-            const encoding = inputEncoding;
             // Process the file paths in chunks, replacing the search text with the replace text in each file
             // This is done to avoid opening too many files at once
-            const chunkSize = 10;
+            const encoding = inputEncoding;
+            const chunkSize = parseInt(maxParallelism);
             yield (0, utils_1.processInChunks)(filePaths, (filePath) => __awaiter(this, void 0, void 0, function* () {
                 (0, core_1.info)(`Replacing text in file ${filePath}`);
                 yield (0, utils_1.replaceTextInFile)(filePath, searchText, replaceText, encoding);
@@ -86,7 +91,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.replaceTextInFile = exports.processInChunks = exports.getFiles = exports.isValidEncoding = void 0;
+exports.replaceTextInFile = exports.processInChunks = exports.getFiles = exports.isValidEncoding = exports.isPositiveInteger = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const glob_1 = __nccwpck_require__(8211);
 const encodings = [
@@ -97,6 +102,16 @@ const encodings = [
     'base64',
     'latin1',
 ];
+/**
+ * Checks if a given string represents a positive integer.
+ *
+ * @param value - The string to check.
+ * @returns True if the string represents a positive integer, false otherwise.
+ */
+function isPositiveInteger(value) {
+    return /^[1-9]\d*$/.test(value);
+}
+exports.isPositiveInteger = isPositiveInteger;
 /**
  * Checks if the given encoding is supported.
  * @param encoding The encoding to check.
