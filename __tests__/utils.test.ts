@@ -29,6 +29,22 @@ describe('isPositiveInteger', () => {
   it('should return false for non-numeric strings', () => {
     expect(isPositiveInteger('abc')).toBe(false);
   });
+
+  it('should return false for empty strings', () => {
+    expect(isPositiveInteger('')).toBe(false);
+  });
+
+  it('should return false for whitespace strings', () => {
+    expect(isPositiveInteger(' ')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isPositiveInteger(null as any)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isPositiveInteger(undefined as any)).toBe(false);
+  });
 });
 
 describe('isValidEncoding', () => {

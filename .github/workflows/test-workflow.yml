@@ -38,6 +38,7 @@ jobs:
           files: '**/*.txt'
           replacement-text: '1.0.2'
           exclude: '**/*.check.txt'
+          max-parallelism: '1'
 
       - name: Replace in Files - replace using special characters
         uses: ./
@@ -90,6 +91,26 @@ jobs:
           replacement-text: 'bar'
           encoding: 'invalid'
           exclude: '**/*.check.txt'
+
+      - name: Replace in Files - error on invalid max-parallelism (invalid number)
+        uses: ./
+        continue-on-error: true
+        with:
+          search-text: 'foo'
+          files: '**/*.txt'
+          replacement-text: 'bar'
+          exclude: '**/*.check.txt'
+          max-parallelism: '-1'
+
+      - name: Replace in Files - error on invalid max-parallelism (invalid string)
+        uses: ./
+        continue-on-error: true
+        with:
+          search-text: 'foo'
+          files: '**/*.txt'
+          replacement-text: 'bar'
+          exclude: '**/*.check.txt'
+          max-parallelism: 'invalid'
 
       - name: Verify changes
         run: |
