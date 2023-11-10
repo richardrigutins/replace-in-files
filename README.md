@@ -28,6 +28,9 @@ It can be useful for automating repetitive tasks such as updating version number
 - `exclude`:
 (Optional) The files to be excluded from the search. It can be the path to a file or a glob pattern matching one or more files (e.g. `**/*.md`). Defaults to an empty string.
 
+- `max-parallelism`:
+(Optional) The maximum number of files that will be processed in parallel. This can be used to control the performance impact of the operation on the system. It should be a positive integer. Defaults to `10`.
+
 ## Example usage
 
 ```yaml
@@ -41,6 +44,7 @@ It can be useful for automating repetitive tasks such as updating version number
     replacement-text: 'world'
     exclude: 'node_modules/**'
     encoding: 'utf8'
+    max-parallelism: 10
 
 # Replace all the occurrences of '{0}' with '42' in the README.md file
 - name: Replace single file

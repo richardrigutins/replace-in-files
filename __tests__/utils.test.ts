@@ -1,6 +1,51 @@
 import fs from 'fs';
 import path from 'path';
-import { getFiles, isValidEncoding, replaceTextInFile } from '../src/utils';
+import {
+  getFiles,
+  isPositiveInteger,
+  isValidEncoding,
+  processInChunks,
+  replaceTextInFile,
+} from '../src/utils';
+
+describe('isPositiveInteger', () => {
+  it('should return true for positive integers', () => {
+    expect(isPositiveInteger('1')).toBe(true);
+    expect(isPositiveInteger('123')).toBe(true);
+  });
+
+  it('should return false for zero', () => {
+    expect(isPositiveInteger('0')).toBe(false);
+  });
+
+  it('should return false for negative integers', () => {
+    expect(isPositiveInteger('-1')).toBe(false);
+  });
+
+  it('should return false for non-integer numbers', () => {
+    expect(isPositiveInteger('1.5')).toBe(false);
+  });
+
+  it('should return false for non-numeric strings', () => {
+    expect(isPositiveInteger('abc')).toBe(false);
+  });
+
+  it('should return false for empty strings', () => {
+    expect(isPositiveInteger('')).toBe(false);
+  });
+
+  it('should return false for whitespace strings', () => {
+    expect(isPositiveInteger(' ')).toBe(false);
+  });
+
+  it('should return false for null', () => {
+    expect(isPositiveInteger(null as any)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isPositiveInteger(undefined as any)).toBe(false);
+  });
+});
 
 describe('isValidEncoding', () => {
   it('should return true for valid encodings', () => {
@@ -26,6 +71,33 @@ describe('getFiles', () => {
     const pattern = path.join(__dirname, '*.test.ts');
     const files = await getFiles(pattern);
     expect(files).toContain(path.join(__dirname, 'utils.test.ts'));
+  });
+});
+
+describe('processInChunks', () => {
+  it('should process an array in chunks', async () => {
+    const totalItems = 999;
+    const array = Array.from({ length: totalItems }, (_, i) => i);
+    const func = jest.fn(async (item: number) => {
+      item++;
+    });
+    const chunkSize = 100;
+
+    await processInChunks(array, func, chunkSize);
+
+    expect(func).toHaveBeenCalledTimes(totalItems);
+  });
+
+  it('should process an array with less items than chunk size', async () => {
+    const array = Array.from({ length: 50 }, (_, i) => i);
+    const func = jest.fn(async (item: number) => {
+      item++;
+    });
+    const chunkSize = 100;
+
+    await processInChunks(array, func, chunkSize);
+
+    expect(func).toHaveBeenCalledTimes(50);
   });
 });
 
