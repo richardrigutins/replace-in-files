@@ -28,7 +28,7 @@
     "glob": "^10.3.7"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.11",
+    "@types/jest": "^29.5.12",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.16",
     "@typescript-eslint/parser": "^5.62.0",
