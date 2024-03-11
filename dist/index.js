@@ -169,8 +169,8 @@ exports.processInChunks = processInChunks;
  * @returns A Promise that resolves when the file has been modified.
  * @throws An error if there is an error reading or saving the file.
  */
-function replaceTextInFile(filePath, searchText, replacementText, encoding = 'utf8') {
-    return __awaiter(this, void 0, void 0, function* () {
+function replaceTextInFile(filePath_1, searchText_1, replacementText_1) {
+    return __awaiter(this, arguments, void 0, function* (filePath, searchText, replacementText, encoding = 'utf8') {
         // Don't do anything if the search text is empty
         if (!searchText) {
             return;
