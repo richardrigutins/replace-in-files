@@ -1,92 +1,11 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 3109:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __nccwpck_require__(2186);
-const utils_1 = __nccwpck_require__(918);
-// Entry point for the action
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            // Get the input parameters
-            const filesPattern = (0, core_1.getInput)('files');
-            const searchText = (0, core_1.getInput)('search-text');
-            const replaceText = (0, core_1.getInput)('replacement-text');
-            const excludePattern = (0, core_1.getInput)('exclude');
-            const inputEncoding = (0, core_1.getInput)('encoding');
-            const maxParallelism = (0, core_1.getInput)('max-parallelism');
-            // Validate the encoding
-            if (!(0, utils_1.isValidEncoding)(inputEncoding)) {
-                throw new Error(`Invalid encoding: ${inputEncoding}`);
-            }
-            // Validate that maxParallelism is a positive integer
-            if (!(0, utils_1.isPositiveInteger)(maxParallelism)) {
-                throw new Error(`Invalid max-parallelism: ${maxParallelism}`);
-            }
-            // Get the file paths that match the files pattern and do not match the exclude pattern
-            const filePaths = yield (0, utils_1.getFiles)(filesPattern, excludePattern);
-            // If no file paths were found, log a warning and exit
-            if (filePaths.length === 0) {
-                (0, core_1.warning)(`No files found for the given pattern.`);
-                return;
-            }
-            (0, core_1.info)(`Found ${filePaths.length} files for the given pattern.`);
-            (0, core_1.info)(`Replacing "${searchText}" with "${replaceText}".`);
-            // Process the file paths in chunks, replacing the search text with the replace text in each file
-            // This is done to avoid opening too many files at once
-            const encoding = inputEncoding;
-            const chunkSize = parseInt(maxParallelism);
-            yield (0, utils_1.processInChunks)(filePaths, (filePath) => __awaiter(this, void 0, void 0, function* () {
-                (0, core_1.info)(`Replacing text in file ${filePath}`);
-                yield (0, utils_1.replaceTextInFile)(filePath, searchText, replaceText, encoding);
-            }), chunkSize);
-            (0, core_1.info)(`Done!`);
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                (0, core_1.setFailed)(err.message);
-            }
-            else {
-                const errorMessage = 'An error occurred. Run in debug mode for additional info.';
-                (0, core_1.debug)(`${JSON.stringify(err)}`);
-                (0, core_1.setFailed)(errorMessage);
-            }
-        }
-    });
-}
-run();
-
-
-/***/ }),
-
 /***/ 918:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -128,15 +47,13 @@ exports.isValidEncoding = isValidEncoding;
  * @returns A Promise that resolves to an array of file paths.
  * @throws An error if there is an error getting the files.
  */
-function getFiles(filesPattern, exclude) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return yield (0, glob_1.glob)(filesPattern, { ignore: exclude });
-        }
-        catch (error) {
-            throw new Error(`Error getting files: ${error}`);
-        }
-    });
+async function getFiles(filesPattern, exclude) {
+    try {
+        return await (0, glob_1.glob)(filesPattern, { ignore: exclude });
+    }
+    catch (error) {
+        throw new Error(`Error getting files: ${error}`);
+    }
 }
 exports.getFiles = getFiles;
 /**
@@ -146,18 +63,16 @@ exports.getFiles = getFiles;
  * @param chunkSize The number of items to process at a time.
  * @returns A Promise that resolves when all items have been processed.
  */
-function processInChunks(array, func, chunkSize) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Split the array into chunks
-        const chunks = Array(Math.ceil(array.length / chunkSize))
-            .fill(0)
-            .map((_, index) => index * chunkSize)
-            .map(begin => array.slice(begin, begin + chunkSize));
-        // Process each chunk
-        for (const chunk of chunks) {
-            yield Promise.all(chunk.map(func));
-        }
-    });
+async function processInChunks(array, func, chunkSize) {
+    // Split the array into chunks
+    const chunks = Array(Math.ceil(array.length / chunkSize))
+        .fill(0)
+        .map((_, index) => index * chunkSize)
+        .map(begin => array.slice(begin, begin + chunkSize));
+    // Process each chunk
+    for (const chunk of chunks) {
+        await Promise.all(chunk.map(func));
+    }
 }
 exports.processInChunks = processInChunks;
 /**
@@ -169,16 +84,14 @@ exports.processInChunks = processInChunks;
  * @returns A Promise that resolves when the file has been modified.
  * @throws An error if there is an error reading or saving the file.
  */
-function replaceTextInFile(filePath_1, searchText_1, replacementText_1) {
-    return __awaiter(this, arguments, void 0, function* (filePath, searchText, replacementText, encoding = 'utf8') {
-        // Don't do anything if the search text is empty
-        if (!searchText) {
-            return;
-        }
-        const fileContent = yield readFileContent(filePath, encoding);
-        const updatedContent = fileContent.replace(searchText, replacementText);
-        yield saveFileContent(filePath, updatedContent);
-    });
+async function replaceTextInFile(filePath, searchText, replacementText, encoding = 'utf8') {
+    // Don't do anything if the search text is empty
+    if (!searchText) {
+        return;
+    }
+    const fileContent = await readFileContent(filePath, encoding);
+    const updatedContent = fileContent.replaceAll(searchText, replacementText);
+    await saveFileContent(filePath, updatedContent);
 }
 exports.replaceTextInFile = replaceTextInFile;
 /**
@@ -188,16 +101,14 @@ exports.replaceTextInFile = replaceTextInFile;
  * @returns A Promise that resolves to the content of the file as a string.
  * @throws An error if there is an error reading the file.
  */
-function readFileContent(filePath, encoding) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const fileContentBuffer = yield fs_1.default.promises.readFile(filePath, encoding);
-            return fileContentBuffer.toString();
-        }
-        catch (error) {
-            throw new Error(`Error reading file content: ${error}`);
-        }
-    });
+async function readFileContent(filePath, encoding) {
+    try {
+        const fileContentBuffer = await fs_1.default.promises.readFile(filePath, encoding);
+        return fileContentBuffer.toString();
+    }
+    catch (error) {
+        throw new Error(`Error reading file content: ${error}`);
+    }
 }
 /**
  * Saves the given content to the file at the given path.
@@ -206,15 +117,13 @@ function readFileContent(filePath, encoding) {
  * @returns A Promise that resolves when the file has been saved.
  * @throws An error if there is an error saving the file.
  */
-function saveFileContent(filePath, content) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield fs_1.default.promises.writeFile(filePath, content);
-        }
-        catch (error) {
-            throw new Error(`Error saving file content: ${error}`);
-        }
-    });
+async function saveFileContent(filePath, content) {
+    try {
+        await fs_1.default.promises.writeFile(filePath, content);
+    }
+    catch (error) {
+        throw new Error(`Error saving file content: ${error}`);
+    }
 }
 
 
@@ -11088,13 +10997,68 @@ exports.LRUCache = LRUCache;
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __nccwpck_require__(2186);
+const utils_1 = __nccwpck_require__(918);
+// Entry point for the action
+async function run() {
+    try {
+        // Get the input parameters
+        const filesPattern = (0, core_1.getInput)('files');
+        const searchText = (0, core_1.getInput)('search-text');
+        const replaceText = (0, core_1.getInput)('replacement-text');
+        const excludePattern = (0, core_1.getInput)('exclude');
+        const inputEncoding = (0, core_1.getInput)('encoding');
+        const maxParallelism = (0, core_1.getInput)('max-parallelism');
+        // Validate the encoding
+        if (!(0, utils_1.isValidEncoding)(inputEncoding)) {
+            throw new Error(`Invalid encoding: ${inputEncoding}`);
+        }
+        // Validate that maxParallelism is a positive integer
+        if (!(0, utils_1.isPositiveInteger)(maxParallelism)) {
+            throw new Error(`Invalid max-parallelism: ${maxParallelism}`);
+        }
+        // Get the file paths that match the files pattern and do not match the exclude pattern
+        const filePaths = await (0, utils_1.getFiles)(filesPattern, excludePattern);
+        // If no file paths were found, log a warning and exit
+        if (filePaths.length === 0) {
+            (0, core_1.warning)(`No files found for the given pattern.`);
+            return;
+        }
+        (0, core_1.info)(`Found ${filePaths.length} files for the given pattern.`);
+        (0, core_1.info)(`Replacing "${searchText}" with "${replaceText}".`);
+        // Process the file paths in chunks, replacing the search text with the replace text in each file
+        // This is done to avoid opening too many files at once
+        const encoding = inputEncoding;
+        const chunkSize = parseInt(maxParallelism);
+        await (0, utils_1.processInChunks)(filePaths, async (filePath) => {
+            (0, core_1.info)(`Replacing text in file ${filePath}`);
+            await (0, utils_1.replaceTextInFile)(filePath, searchText, replaceText, encoding);
+        }, chunkSize);
+        (0, core_1.info)(`Done!`);
+    }
+    catch (err) {
+        if (err instanceof Error) {
+            (0, core_1.setFailed)(err.message);
+        }
+        else {
+            const errorMessage = 'An error occurred. Run in debug mode for additional info.';
+            (0, core_1.debug)(`${JSON.stringify(err)}`);
+            (0, core_1.setFailed)(errorMessage);
+        }
+    }
+}
+run();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map

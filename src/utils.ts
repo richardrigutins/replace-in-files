@@ -94,7 +94,7 @@ export async function replaceTextInFile(
   }
 
   const fileContent = await readFileContent(filePath, encoding);
-  const updatedContent = fileContent.replace(searchText, replacementText);
+  const updatedContent = fileContent.replaceAll(searchText, replacementText);
   await saveFileContent(filePath, updatedContent);
 }
 

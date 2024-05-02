@@ -103,7 +103,7 @@ describe('processInChunks', () => {
 
 describe('replaceTextInFile', () => {
   const testFilePath = path.join(__dirname, 'test-file.txt');
-  const testFileContent = '{0}, world!';
+  const testFileContent = '{0}, foo, {0}!';
 
   beforeEach(async () => {
     await fs.promises.writeFile(testFilePath, testFileContent);
@@ -114,10 +114,10 @@ describe('replaceTextInFile', () => {
   });
 
   it('should replace all instances of the given text with the given value in the file', async () => {
-    await replaceTextInFile(testFilePath, '{0}', 'Hello'); // Replace text with special characters
-    await replaceTextInFile(testFilePath, 'world', 'universe'); // Replace text with no special characters
+    await replaceTextInFile(testFilePath, '{0}', 'run'); // Replace text with special characters
+    await replaceTextInFile(testFilePath, 'foo', 'test'); // Replace text with letters
     const updatedContent = await fs.promises.readFile(testFilePath, 'utf-8');
-    expect(updatedContent).toBe('Hello, universe!');
+    expect(updatedContent).toBe('run, test, run!');
   });
 
   it('should not modify the file if the search text is not found', async () => {

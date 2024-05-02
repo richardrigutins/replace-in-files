@@ -3,3 +3,4 @@ Hello {0}!
 This should be twenty-three: 23.
 This line has been changed: false.
 This value comes from environment variables: _ENV_
+Multiple occurrences in the same file: {0}
