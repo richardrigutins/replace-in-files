@@ -3,13 +3,13 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     commit-message:
-      prefix: "chore(deps): "
+      prefix: "[chore] "
     schedule:
       interval: weekly
 
   - package-ecosystem: npm
     directory: /
     commit-message:
-      prefix: "chore(deps): "
+      prefix: "[chore] "
     schedule:
       interval: weekly
