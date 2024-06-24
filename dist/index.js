@@ -10,7 +10,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.replaceTextInFile = exports.processInChunks = exports.getFiles = exports.isValidEncoding = exports.isPositiveInteger = void 0;
+exports.isPositiveInteger = isPositiveInteger;
+exports.isValidEncoding = isValidEncoding;
+exports.getFiles = getFiles;
+exports.processInChunks = processInChunks;
+exports.replaceTextInFile = replaceTextInFile;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const glob_1 = __nccwpck_require__(8211);
 const encodings = [
@@ -30,7 +34,6 @@ const encodings = [
 function isPositiveInteger(value) {
     return /^[1-9]\d*$/.test(value);
 }
-exports.isPositiveInteger = isPositiveInteger;
 /**
  * Checks if the given encoding is supported.
  * @param encoding The encoding to check.
@@ -39,7 +42,6 @@ exports.isPositiveInteger = isPositiveInteger;
 function isValidEncoding(encoding) {
     return encodings.includes(encoding);
 }
-exports.isValidEncoding = isValidEncoding;
 /**
  * Returns an array of file paths that match the given pattern.
  * @param filesPattern The file path or glob pattern to search for.
@@ -55,7 +57,6 @@ async function getFiles(filesPattern, exclude) {
         throw new Error(`Error getting files: ${error}`);
     }
 }
-exports.getFiles = getFiles;
 /**
  * Processes an array in chunks, applying a given function to each item.
  * @param array The array to process.
@@ -74,7 +75,6 @@ async function processInChunks(array, func, chunkSize) {
         await Promise.all(chunk.map(func));
     }
 }
-exports.processInChunks = processInChunks;
 /**
  * Replaces all instances of the given text with the given value in the file.
  * @param filePath The path of the file to modify.
@@ -93,7 +93,6 @@ async function replaceTextInFile(filePath, searchText, replacementText, encoding
     const updatedContent = fileContent.replaceAll(searchText, replacementText);
     await saveFileContent(filePath, updatedContent);
 }
-exports.replaceTextInFile = replaceTextInFile;
 /**
  * Reads the content of the file at the given path.
  * @param filePath The path of the file to read.
