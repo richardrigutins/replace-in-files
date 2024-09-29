@@ -11,8 +11,9 @@
 #
 # 1. Get the latest release tag
 # 2. Prompt the user for a new release tag
-# 3. Tag the new release
-# 4. Push the new tag to the remote
+# 3. Check if the tag exists and ask for confirmation to overwrite
+# 4. Tag the new release
+# 5. Push the new tag to the remote
 #
 # Usage:
 #
@@ -47,6 +48,28 @@ else
 	# Release tag is not `vX.X.X` format
 	echo -e "Tag: ${BLUE}$new_tag${OFF} is ${RED}not valid${OFF} (must be in vX.X.X format)"
 	exit 1
+fi
+
+# Check if the tag exists; if it does, ask the user for confirmation to overwrite
+if git rev-parse -q --verify "refs/tags/$new_tag" >/dev/null; then
+	read -r -p "The tag already exists. Overwrite? [y/N] " response
+	if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+		echo -e "${RED}Aborted${OFF}"
+		exit 1
+	else
+		# Delete the tag locally
+		git tag -d "$new_tag"
+		echo -e "${GREEN}Deleted local tag: $new_tag${OFF}"
+		# Delete the tag remotely
+		git push origin --delete "$new_tag"
+		echo -e "${GREEN}Deleted remote tag: $new_tag${OFF}"
+	fi
+else
+	read -r -p "The tag does not exist and will be created. Continue? [y/N] " response
+	if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+		echo -e "${RED}Aborted${OFF}"
+		exit 1
+	fi
 fi
 
 # Tag the new release
