@@ -13,3 +13,10 @@ updates:
       prefix: "[Chore] "
     schedule:
       interval: weekly
+
+  - package-ecosystem: devcontainers
+    directory: /
+    commit-message:
+      prefix: "[Chore] "
+    schedule:
+      interval: weekly
