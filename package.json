@@ -28,7 +28,7 @@
     "glob": "^11.0.2"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^2.13.0",
+    "@stylistic/eslint-plugin": "^4.4.1",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.21",
