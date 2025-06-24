@@ -20,7 +20,8 @@
 				"me-dutour-mathieu.vscode-github-actions",
 				"redhat.vscode-yaml",
 				"rvest.vs-code-prettier-eslint",
-				"yzhang.markdown-all-in-one"
+				"yzhang.markdown-all-in-one",
+				"eamodio.gitlens"
 			],
 			"settings": {
 				"editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -37,6 +38,6 @@
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers-contrib/features/prettier:1": {}
+		"ghcr.io/devcontainers-community/npm-features/prettier:1": {}
 	}
 }
