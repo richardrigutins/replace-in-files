@@ -24,7 +24,7 @@
   "author": "richardrigutins",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
+    "@actions/core": "^2.0.2",
     "glob": "^13.0.0"
   },
   "devDependencies": {
