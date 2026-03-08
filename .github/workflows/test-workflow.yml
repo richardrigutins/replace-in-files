@@ -210,3 +210,18 @@ jobs:
         run: |
           diff test-files/test1.txt test-files/test1.check.txt
           diff test-files/test2.txt test-files/test2.check.txt
+
+      - name: Log test files on failure
+        if: ${{ failure() }}
+        run: |
+          echo "::: test1.txt :::"
+          cat test-files/test1.txt
+          echo "::: test2.txt :::"
+          cat test-files/test2.txt
+
+      - name: Upload test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.node-version }}
+          path: test-files/*.txt
