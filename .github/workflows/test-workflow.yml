@@ -1,4 +1,4 @@
-name: Build and Test
+name: Integration Tests
 on:
   push:
     branches:
@@ -10,32 +10,21 @@ on:
       - '**.md'
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 20.x
-          cache: npm
-
-      - run: |
-          npm ci
-
-      - run: |
-          npm run all
-
   test: # make sure the action works on a clean machine without building
     strategy:
       matrix:
-        # os: [ ubuntu-latest, windows-latest, macos-latest ]
-        os: [ ubuntu-latest ] # only test on ubuntu for now
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node-version: [20.x, 22.x]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Replace in Files - replace string
         uses: ./
@@ -46,6 +35,12 @@ jobs:
           exclude: '**/*.check.txt'
           max-parallelism: '1'
 
+      - name: Verify replace string
+        shell: bash
+        run: |
+          grep -q "1.0.2" test-files/test1.txt
+          ! grep -q "@VERSION@" test-files/test1.txt
+
       - name: Replace in Files - replace using special characters
         uses: ./
         with:
@@ -53,6 +48,14 @@ jobs:
           files: '**/*.txt'
           replacement-text: 'world'
           exclude: '**/*.check.txt'
+
+      - name: Verify replace using special characters
+        shell: bash
+        run: |
+          grep -q "world" test-files/test1.txt
+          grep -q "world" test-files/test2.txt
+          ! grep -q "{0}" test-files/test1.txt
+          ! grep -q "{0}" test-files/test2.txt
 
       - name: Replace in Files - replace using environment variable
         uses: ./
@@ -64,6 +67,12 @@ jobs:
         env:
           REPLACEMENT: environment
 
+      - name: Verify replace using environment variable
+        shell: bash
+        run: |
+          grep -q "environment" test-files/test1.txt
+          ! grep -q "_ENV_" test-files/test1.txt
+
       - name: Replace in Files - pattern finds only one file
         uses: ./
         with:
@@ -72,6 +81,13 @@ jobs:
           replacement-text: '42'
           exclude: '**/*.check.txt'
 
+      - name: Verify pattern finds only one file
+        shell: bash
+        run: |
+          grep -q "42" test-files/test2.txt
+          ! grep -q "23" test-files/test2.txt
+          grep -q "23" test-files/test1.txt
+
       - name: Replace in Files - single file
         uses: ./
         with:
@@ -79,6 +95,54 @@ jobs:
           files: 'test-files/test2.txt'
           replacement-text: 'true'
           exclude: '**/*.check.txt'
+
+      - name: Verify single file
+        shell: bash
+        run: |
+          grep -q "true" test-files/test2.txt
+          ! grep -q "false" test-files/test2.txt
+
+      - name: Replace in Files - literal characters
+        uses: ./
+        with:
+          search-text: '21 * 2'
+          files: 'test-files/test2.txt'
+          replacement-text: '42 / 1'
+
+      - name: Verify literal characters
+        shell: bash
+        run: |
+          grep -q "42 / 1 = 42" test-files/test2.txt
+          ! grep -q "21 * 2" test-files/test2.txt
+
+      - name: Replace in Files - empty replacement
+        uses: ./
+        with:
+          search-text: 'Hello again '
+          files: 'test-files/test2.txt'
+          replacement-text: ''
+
+      - name: Verify empty replacement
+        shell: bash
+        run: |
+          grep -q "^world!" test-files/test2.txt
+          ! grep -q "Hello again" test-files/test2.txt
+
+      - name: Replace in Files - verify exclude
+        uses: ./
+        with:
+          search-text: 'world'
+          files: 'test-files/*.txt'
+          replacement-text: 'universe'
+          exclude: 'test-files/test2.txt'
+
+      - name: Verify exclude
+        shell: bash
+        run: |
+          grep -q "universe" test-files/test1.txt
+          ! grep -q "world" test-files/test1.txt
+          grep -q "world" test-files/test2.txt
+          ! grep -q "universe" test-files/test2.txt
 
       - name: Replace in Files - no files matching pattern
         uses: ./
@@ -91,6 +155,7 @@ jobs:
       - name: Replace in Files - error on invalid encoding
         uses: ./
         continue-on-error: true
+        id: invalid_encoding
         with:
           search-text: 'foo'
           files: '**/*.txt'
@@ -98,9 +163,17 @@ jobs:
           encoding: 'invalid'
           exclude: '**/*.check.txt'
 
+      - name: Verify error on invalid encoding
+        run: |
+          if [[ "${{ steps.invalid_encoding.outcome }}" != "failure" ]]; then
+            echo "Expected step to fail due to invalid encoding"
+            exit 1
+          fi
+
       - name: Replace in Files - error on invalid max-parallelism (invalid number)
         uses: ./
         continue-on-error: true
+        id: invalid_max_parallelism_num
         with:
           search-text: 'foo'
           files: '**/*.txt'
@@ -108,9 +181,17 @@ jobs:
           exclude: '**/*.check.txt'
           max-parallelism: '-1'
 
+      - name: Verify error on invalid max-parallelism (number)
+        run: |
+          if [[ "${{ steps.invalid_max_parallelism_num.outcome }}" != "failure" ]]; then
+            echo "Expected step to fail due to invalid max-parallelism"
+            exit 1
+          fi
+
       - name: Replace in Files - error on invalid max-parallelism (invalid string)
         uses: ./
         continue-on-error: true
+        id: invalid_max_parallelism_str
         with:
           search-text: 'foo'
           files: '**/*.txt'
@@ -118,19 +199,14 @@ jobs:
           exclude: '**/*.check.txt'
           max-parallelism: 'invalid'
 
-      - name: Verify changes
+      - name: Verify error on invalid max-parallelism (string)
         run: |
-          echo "  > Actual - test1.txt"
-          cat test-files/test1.txt
-          echo "=================="
-          echo "  > Expected - test1.txt"
-          cat test-files/test1.check.txt
-          echo "=================="
-          echo "  > Actual - test2.txt"
-          cat test-files/test2.txt
-          echo "=================="
-          echo "  > Expected - test2.txt"
-          cat test-files/test2.check.txt
-          echo "=================="
-          diff test-files/test1.txt test-files/test1.check.txt >diff1.txt
-          diff test-files/test2.txt test-files/test2.check.txt >diff2.txt
+          if [[ "${{ steps.invalid_max_parallelism_str.outcome }}" != "failure" ]]; then
+            echo "Expected step to fail due to invalid max-parallelism"
+            exit 1
+          fi
+
+      - name: Final Verify changes
+        run: |
+          diff test-files/test1.txt test-files/test1.check.txt
+          diff test-files/test2.txt test-files/test2.check.txt
