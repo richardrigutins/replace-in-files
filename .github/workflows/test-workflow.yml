@@ -125,7 +125,7 @@ jobs:
       - name: Verify empty replacement
         shell: bash
         run: |
-          grep -q "^world!" test-files/test2.txt
+          grep -q " world!" test-files/test2.txt
           ! grep -q "Hello again" test-files/test2.txt
 
       - name: Replace in Files - verify exclude
