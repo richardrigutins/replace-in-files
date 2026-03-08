@@ -32,7 +32,7 @@ jobs:
           search-text: '@VERSION@'
           files: '**/*.txt'
           replacement-text: '1.0.2'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
           max-parallelism: '1'
 
       - name: Verify replace string
@@ -47,7 +47,7 @@ jobs:
           search-text: '{0}'
           files: '**/*.txt'
           replacement-text: 'world'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
 
       - name: Verify replace using special characters
         shell: bash
@@ -63,7 +63,7 @@ jobs:
           search-text: '_ENV_'
           files: '**/*.txt'
           replacement-text: ${{ env.REPLACEMENT }}
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
         env:
           REPLACEMENT: environment
 
@@ -79,7 +79,7 @@ jobs:
           search-text: '23'
           files: '**/test2.txt'
           replacement-text: '42'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
 
       - name: Verify pattern finds only one file
         shell: bash
@@ -94,7 +94,7 @@ jobs:
           search-text: 'false'
           files: 'test-files/test2.txt'
           replacement-text: 'true'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
 
       - name: Verify single file
         shell: bash
@@ -150,7 +150,7 @@ jobs:
           search-text: 'foo'
           files: '**/*.invalid'
           replacement-text: 'bar'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
 
       - name: Replace in Files - error on invalid encoding
         uses: ./
@@ -161,7 +161,7 @@ jobs:
           files: '**/*.txt'
           replacement-text: 'bar'
           encoding: 'invalid'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
 
       - name: Verify error on invalid encoding
         run: |
@@ -178,7 +178,7 @@ jobs:
           search-text: 'foo'
           files: '**/*.txt'
           replacement-text: 'bar'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
           max-parallelism: '-1'
 
       - name: Verify error on invalid max-parallelism (number)
@@ -196,7 +196,7 @@ jobs:
           search-text: 'foo'
           files: '**/*.txt'
           replacement-text: 'bar'
-          exclude: '**/*.check.txt'
+          exclude: 'test-files/check/**'
           max-parallelism: 'invalid'
 
       - name: Verify error on invalid max-parallelism (string)
@@ -208,8 +208,8 @@ jobs:
 
       - name: Final Verify changes
         run: |
-          diff test-files/test1.txt test-files/test1.check.txt
-          diff test-files/test2.txt test-files/test2.check.txt
+          diff test-files/test1.txt test-files/check/test1.check.txt
+          diff test-files/test2.txt test-files/check/test2.check.txt
 
       - name: Log test files on failure
         if: ${{ failure() }}
