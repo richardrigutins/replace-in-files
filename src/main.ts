@@ -6,7 +6,7 @@ import {
   isValidEncoding,
   processInChunks,
   replaceTextInFile,
-} from './utils';
+} from './utils.js';
 
 // Entry point for the action
 async function run(): Promise<void> {

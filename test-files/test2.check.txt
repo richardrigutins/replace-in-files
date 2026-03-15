@@ -1,3 +1,0 @@
-Hello again world!
-21 * 2 = 42
-This line has been changed: true.

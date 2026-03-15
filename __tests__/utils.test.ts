@@ -1,12 +1,24 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+import {
+  jest,
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+} from '@jest/globals';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import {
   getFiles,
   isPositiveInteger,
   isValidEncoding,
   processInChunks,
   replaceTextInFile,
-} from '../src/utils';
+} from '../src/utils.js';
 
 describe('isPositiveInteger', () => {
   it('should return true for positive integers', () => {
