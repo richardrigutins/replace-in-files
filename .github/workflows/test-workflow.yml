@@ -11,6 +11,8 @@ on:
 
 jobs:
   test: # make sure the action works on a clean machine without building
+        # Note: test steps run sequentially and modify test files cumulatively.
+        # Each step verifies its own changes. test-files/check/ holds the final expected state.
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
@@ -217,6 +219,7 @@ jobs:
 
       - name: Log test files on failure
         if: ${{ failure() }}
+        shell: bash
         run: |
           echo "::: test1.txt :::"
           cat test-files/test1.txt

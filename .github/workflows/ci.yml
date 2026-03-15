@@ -26,5 +26,5 @@ jobs:
 
       - run: npm ci
 
-      - name: Lint and Test
+      - name: Build, Lint and Test
         run: npm run all
