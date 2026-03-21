@@ -41,7 +41,7 @@ echo -e "The latest release tag is: ${BLUE}${latest_tag}${OFF}"
 read -r -p 'Enter a new release tag (vX.X.X format): ' new_tag
 
 # Validate the new release tag
-tag_regex='v[0-9]+(\.[0-9]+){0,2}$'
+tag_regex='^v[0-9]+\.[0-9]+\.[0-9]+$'
 if echo "$new_tag" | grep -q -E "$tag_regex"; then
 	echo -e "Tag: ${BLUE}$new_tag${OFF} is valid"
 else
@@ -50,26 +50,61 @@ else
 	exit 1
 fi
 
+major_tag=$(echo "$new_tag" | cut -d. -f1)
+update_major=false
+
 # Check if the tag exists; if it does, ask the user for confirmation to overwrite
+tag_exists=false
 if git rev-parse -q --verify "refs/tags/$new_tag" >/dev/null; then
-	read -r -p "The tag already exists. Overwrite? [y/N] " response
+	tag_exists=true
+	read -r -p "The tag $new_tag already exists. Overwrite? [y/N] " response
 	if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 		echo -e "${RED}Aborted${OFF}"
 		exit 1
-	else
-		# Delete the tag locally
-		git tag -d "$new_tag"
-		echo -e "${GREEN}Deleted local tag: $new_tag${OFF}"
-		# Delete the tag remotely
+	fi
+else
+	read -r -p "The tag $new_tag does not exist and will be created. Continue? [y/N] " response
+	if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+		echo -e "${RED}Aborted${OFF}"
+		exit 1
+	fi
+fi
+
+if [[ "$new_tag" != "$major_tag" ]]; then
+	read -r -p "Do you also want to update the major tag ($major_tag)? [Y/n] " response
+	if [[ -z "$response" || "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+		update_major=true
+	fi
+fi
+
+if [[ "$tag_exists" == true ]]; then
+	# Delete the tag locally
+	git tag -d "$new_tag"
+	echo -e "${GREEN}Deleted local tag: $new_tag${OFF}"
+	# Delete the tag remotely
+	if git ls-remote --tags --exit-code origin "refs/tags/$new_tag" >/dev/null 2>&1; then
 		git push origin --delete "$new_tag"
 		echo -e "${GREEN}Deleted remote tag: $new_tag${OFF}"
 	fi
-else
-	read -r -p "The tag does not exist and will be created. Continue? [y/N] " response
-	if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-		echo -e "${RED}Aborted${OFF}"
-		exit 1
+fi
+
+if [[ "$update_major" == true ]]; then
+	# Delete the major tag if it exists locally
+	if git rev-parse -q --verify "refs/tags/$major_tag" >/dev/null 2>&1; then
+		git tag -d "$major_tag"
+		echo -e "${GREEN}Deleted local tag: $major_tag${OFF}"
 	fi
+	# Delete the major tag remotely
+	if git ls-remote --tags --exit-code origin "refs/tags/$major_tag" >/dev/null 2>&1; then
+		git push origin --delete "$major_tag"
+		echo -e "${GREEN}Deleted remote tag: $major_tag${OFF}"
+	fi
+	
+	# Tag and push the major release
+	git tag -a "$major_tag" -m "$major_tag Release"
+	echo -e "${GREEN}Tagged: $major_tag${OFF}"
+	git push origin "$major_tag"
+	echo -e "${GREEN}Pushed major tag: $major_tag${OFF}"
 fi
 
 # Tag the new release
@@ -77,6 +112,6 @@ git tag -a "$new_tag" -m "$new_tag Release"
 echo -e "${GREEN}Tagged: $new_tag${OFF}"
 
 # Push the new tag to the remote
-git push --tags
-echo -e "${GREEN}Release tag pushed to remote${OFF}"
+git push origin "$new_tag"
+echo -e "${GREEN}Pushed new tag: $new_tag${OFF}"
 echo -e "${GREEN}Done!${OFF}"
