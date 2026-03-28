@@ -69,12 +69,10 @@ to run all tests, lint the code, and build the final JavaScript action code:
 npm run all
 ```
 
-> This step is important! It will run [`ncc`](https://github.com/vercel/ncc) to
-> build the final JavaScript action code with all dependencies included. If you
-> do not run this step, the action will not work correctly when it is used in a
-> workflow. This step also includes the `--license` option for `ncc`, which will
-> create a license file for all of the production node modules used in your
-> project.
+> This step is important! It will run [Rollup](https://rollupjs.org) to bundle
+> the final JavaScript action code with all dependencies included. If you do not
+> run this step, the action will not work correctly when it is used in a
+> workflow.
 
 ### Publishing a New Release
 
@@ -112,9 +110,11 @@ Contributions are welcome! Here are some ways you can contribute:
 - Fix bugs or implement new features by submitting a pull request.
 
 Before submitting a pull request, please make sure that your changes are consistent with the project's coding style and that all tests pass. To build and run all the tests and linters, run the following command:
-  
+
 ```bash
 npm run all
 ```
 
 Be sure to also include the updated `dist` folder in your pull request.
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/). Please follow the convention when writing commit messages (e.g. `feat: add new input`, `fix: handle empty files`, `chore: update dependencies`).
