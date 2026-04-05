@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^30.3.0",
-    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
     "@stylistic/eslint-plugin": "^2.13.0",
