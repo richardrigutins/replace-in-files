@@ -2,12 +2,15 @@ name: Dependabot dist rebuild
 
 # pull_request_target runs with write GITHUB_TOKEN even for Dependabot PRs,
 # unlike pull_request which gets a read-only token.
+# After pushing, the CI workflows are re-triggered via workflow_dispatch because
+# commits pushed by GITHUB_TOKEN do not automatically trigger new workflow runs.
 on:
   pull_request_target:
     branches: [main]
 
 permissions:
   contents: write
+  actions: write
 
 env:
   GIT_USER_NAME: github-actions[bot]
@@ -36,13 +39,27 @@ jobs:
         run: npm run package
 
       - name: Commit dist changes
+        id: commit
         run: |
           git config user.name "${{ env.GIT_USER_NAME }}"
           git config user.email "${{ env.GIT_USER_EMAIL }}"
           git add dist/
           if git diff --staged --quiet; then
             echo "dist/ is already up to date"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: rebuild dist for dependency update"
             git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Re-trigger CI workflows
+        if: steps.commit.outputs.pushed == 'true'
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          gh workflow run ci.yml --ref "$BRANCH"
+          gh workflow run check-dist.yml --ref "$BRANCH"
+          gh workflow run integration-tests.yml --ref "$BRANCH"
+          gh workflow run codeql-analysis.yml --ref "$BRANCH"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
