@@ -30,7 +30,7 @@
   "author": "richardrigutins",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^3.0.0",
+    "@actions/core": "^3.0.1",
     "glob": "^13.0.6"
   },
   "devDependencies": {
