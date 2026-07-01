@@ -47,7 +47,7 @@
     "eslint": "^8.57.1",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-github": "^5.1.8",
-    "eslint-plugin-jest": "^29.15.2",
+    "eslint-plugin-jest": "^29.15.3",
     "eslint-plugin-prettier": "^5.5.6",
     "jest": "^30.4.2",
     "js-yaml": "^4.1.1",
